@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-valentine-background to-valentine-accent/20 min-h-screen;
+  }
+}
+
+.code-editor {
+  @apply w-full h-48 p-4 rounded-lg font-mono;
+  @apply bg-white/90 backdrop-blur-sm;
+  @apply border-2 border-valentine-primary/20;
+  @apply focus:border-valentine-primary focus:ring-2 focus:ring-valentine-primary/20;
+  @apply transition-all duration-200;
+  @apply resize-none;
+  @apply shadow-inner;
+}
+
+.game-container {
+  @apply container mx-auto max-w-4xl px-4 py-8;
+  @apply flex flex-col min-h-screen;
+}
+
+.game-header {
+  @apply text-center mb-8;
+}
+
+.game-title {
+  @apply text-5xl font-bold text-valentine-primary mb-4;
+  @apply animate-bounce;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-subtitle {
+  @apply text-xl text-valentine-secondary mb-6;
+}
+
+.stats-container {
+  @apply flex justify-center gap-8;
+}
+
+.stat-box {
+  @apply bg-white rounded-lg shadow-lg px-6 py-3;
+  @apply backdrop-blur-sm bg-white/90;
+  @apply border border-valentine-primary/10;
+  @apply text-2xl font-bold text-valentine-primary;
+}
+
+.hint-box {
+  @apply mb-6 p-4 rounded-lg;
+  @apply bg-valentine-accent/20 backdrop-blur-sm;
+  @apply border border-valentine-primary/20;
+  @apply text-valentine-secondary;
+}
+
+.code-display {
+  @apply mb-6 rounded-lg overflow-hidden;
+  @apply border border-valentine-primary/10;
+  @apply shadow-lg;
+}
