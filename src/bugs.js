@@ -130,29 +130,29 @@ console.log(getLastLoveLetter(letters))`,
   },
   {
     id: 5,
-    title: "Heartbeat Counter",
-    code: `let heartbeats = 0
-while (heartbeats < 3) {
-  console.log("💓")
-}`,
-    bugDescription: "The heart never stops beating! We need to count the heartbeats.",
+    title: "Sweet Valentine Greeting",
+    code: `function createValentine(name) {
+  const greeting = "Happy Valentine's Day"
+  return greeting + name + "!"
+}
+// Example: createValentine("Alice") currently returns "Happy Valentine's DayAlice!"
+// We want it to return "Happy Valentine's Day dear Alice!" instead`,
+    bugDescription: "Our Valentine's greeting needs to be more romantic! The function should add the word 'dear' before the name to make it more personal. Also fix the spacing between words.",
     hints: [
-      "The counter never increases",
-      "Add a way to increment heartbeats",
-      "Use heartbeats++ to count each beat",
+      "Look at the example output - words are running together and missing 'dear'",
+      "Add spaces around the word 'dear' when concatenating",
+      "The greeting should look like: greeting + ' dear ' + name + '!'",
       {
         type: "code",
-        content: `let heartbeats = 0
-while (heartbeats < 3) {
-  console.log("💓")
-  heartbeats++
+        content: `function createValentine(name) {
+  const greeting = "Happy Valentine's Day"
+  return greeting + " dear " + name + "!"
 }`
       }
     ],
-    solution: `let heartbeats = 0
-while (heartbeats < 3) {
-  console.log("💓")
-  heartbeats++
+    solution: `function createValentine(name) {
+  const greeting = "Happy Valentine's Day"
+  return greeting + " dear " + name + "!"
 }`,
   },
   {

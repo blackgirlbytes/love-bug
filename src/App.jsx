@@ -12,7 +12,7 @@ function App() {
   const [hintLevel, setHintLevel] = useState(0)
   const [userSolution, setUserSolution] = useState('')
   const [wrongAttempts, setWrongAttempts] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(300) // 5 minutes
+  const [timeLeft, setTimeLeft] = useState(180) // 3 minutes
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState(null)
@@ -99,12 +99,12 @@ function App() {
               error: null
             };
 
-          case 5: // Heartbeat Counter
-            const hasHeartbeatsVar = /let\s+heartbeats\s*=\s*0/.test(functionStr);
-            const hasHeartCondition = /while\s*\(\s*heartbeats\s*<\s*3\s*\)/.test(functionStr);
-            const hasHeartIncrement = /heartbeats\s*\+\+|\+\+\s*heartbeats/.test(functionStr);
+          case 5: // Sweet Valentine Greeting
+            const hasGreetingVar = /const\s+greeting\s*=\s*["']Happy Valentine's Day["']/.test(functionStr);
+            const hasProperConcatenation = /greeting\s*\+\s*["']\s*dear\s*["']\s*\+\s*name/.test(functionStr);
+            const hasExclamation = /\+\s*["']!["']/.test(functionStr);
             return {
-              isValid: hasHeartbeatsVar && hasHeartCondition && hasHeartIncrement,
+              isValid: hasGreetingVar && hasProperConcatenation && hasExclamation,
               error: null
             };
 
@@ -204,8 +204,7 @@ function App() {
       
       setFeedback({
         type: 'error',
-        message: errorMessage,
-        shake: true // We'll use this for animation
+        message: errorMessage
       })
     }
   }
@@ -231,7 +230,7 @@ function App() {
     setCurrentBug(0)
     setHintLevel(0)
     setUserSolution('')
-    setTimeLeft(300)
+    setTimeLeft(180)
     setGameOver(false)
     setScore(0)
     setWrongAttempts(0)
@@ -259,7 +258,10 @@ function App() {
       </header>
 
       {!gameOver ? (
-        <Card className="backdrop-blur-sm bg-white/90">
+        <Card 
+          key={`card-${wrongAttempts}`} 
+          className={`backdrop-blur-sm bg-white/90 ${feedback?.type === 'error' ? 'animate-shake' : ''}`}
+        >
           <CardHeader>
             <CardTitle>{bugs[currentBug].title}</CardTitle>
             <CardDescription>{bugs[currentBug].bugDescription}</CardDescription>
@@ -281,7 +283,7 @@ function App() {
             {feedback && (
               <div className={`my-4 p-4 rounded-lg ${
                 feedback.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
-                feedback.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200 ' + (feedback.shake ? 'animate-shake' : '') :
+                feedback.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
                 feedback.type === 'warning' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
                 'bg-blue-100 text-blue-800 border border-blue-200'
               }`}>
