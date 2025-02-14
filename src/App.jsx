@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Button } from './components/Button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './components/Card'
-import { commonBugs, getRandomBugs } from './bugs'
+import { getRandomBugs } from './bugs'
 
 function App() {
   const [bugs, setBugs] = useState(() => getRandomBugs(3)) // Get 3 random bugs
@@ -12,9 +11,10 @@ function App() {
   const [hintLevel, setHintLevel] = useState(0)
   const [userSolution, setUserSolution] = useState('')
   const [wrongAttempts, setWrongAttempts] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(180) // 3 minutes
+  const [timeLeft, setTimeLeft] = useState(60) // 1 minute
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
+  const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState(null)
 
   useEffect(() => {
@@ -161,6 +161,7 @@ function App() {
     const result = validateCode(userSolution);
     
     if (result.isValid) {
+      setLoading(true)
       // Calculate score based on time bonus only since hint penalties are applied immediately
       const timeBonus = Math.floor(timeLeft / 10) // +1 point per 10 seconds left
       const baseScore = 20 // Base score for solving the problem
@@ -183,6 +184,7 @@ function App() {
         } else {
           setGameOver(true)
         }
+        setLoading(false)
       }, 2000)
     } else {
       // Increment wrong attempts and apply penalty
@@ -230,7 +232,7 @@ function App() {
     setCurrentBug(0)
     setHintLevel(0)
     setUserSolution('')
-    setTimeLeft(180)
+    setTimeLeft(60)
     setGameOver(false)
     setScore(0)
     setWrongAttempts(0)
@@ -346,9 +348,9 @@ function App() {
             <Button
               variant="default"
               onClick={checkSolution}
-              disabled={!userSolution.trim()}
+              disabled={!userSolution.trim() || loading}
             >
-              Submit Fix 💝
+              {loading ? 'Moving to next bug... 💝' : 'Submit Fix 💝'}
             </Button>
           </CardFooter>
         </Card>
