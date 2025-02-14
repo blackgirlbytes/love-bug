@@ -4,77 +4,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Button } from './components/Button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './components/Card'
-
-const commonBugs = [
-  {
-    id: 1,
-    title: "Infinite Loop of Love",
-    code: `function sendLoveMessages() {
-  while (true) {
-    console.log("I love you!")
-  }
-}`,
-    bugDescription: "This function will run forever and crash the browser!",
-    hints: [
-      "Think about what condition could stop the loop",
-      "You might need a counter variable to track progress",
-      "Add a parameter for message count and increment a counter",
-      {
-        type: "code",
-        content: `function sendLoveMessages(times) {
-  let count = 0;
-  while (count < times) {
-    console.log("I love you!")
-    count++;
-  }
-}`
-      }
-    ],
-    solution: `function sendLoveMessages(times) {
-  let count = 0;
-  while (count < times) {
-    console.log("I love you!")
-    count++;
-  }
-}`,
-  },
-  {
-    id: 2,
-    title: "Undefined Love",
-    code: `function getLoveMessage() {
-  let message;
-  if (inLove) {
-    message = "My heart beats for you!"
-  }
-  return message;
-}`,
-    bugDescription: "The variable 'inLove' is not defined, and the message might be undefined!",
-    hints: [
-      "What happens if inLove is false?",
-      "You should add a parameter to the function",
-      "Add a default message and a parameter for the love status",
-      {
-        type: "code",
-        content: `function getLoveMessage(inLove) {
-  let message = "Still searching for love...";
-  if (inLove) {
-    message = "My heart beats for you!"
-  }
-  return message;
-}`
-      }
-    ],
-    solution: `function getLoveMessage(inLove) {
-  let message = "Still searching for love...";
-  if (inLove) {
-    message = "My heart beats for you!"
-  }
-  return message;
-}`,
-  },
-]
+import { commonBugs, getRandomBugs } from './bugs'
 
 function App() {
+  const [bugs, setBugs] = useState(() => getRandomBugs(3)) // Get 3 random bugs
   const [currentBug, setCurrentBug] = useState(0)
   const [hintLevel, setHintLevel] = useState(0)
   const [userSolution, setUserSolution] = useState('')
@@ -101,7 +34,7 @@ function App() {
   }
 
   const checkSolution = () => {
-    const currentProblem = commonBugs[currentBug]
+    const currentProblem = bugs[currentBug]
     
     // Create a safe evaluation environment
     const validateCode = (code) => {
@@ -111,52 +44,107 @@ function App() {
           return { isValid: false, error: 'Unsafe code detected' };
         }
 
-        // For the undefined love bug
-        if (currentProblem.id === 2) {
-          // Check if the function:
-          // 1. Takes an 'inLove' parameter
-          // 2. Has a default message for false case
-          // 3. Returns "My heart beats for you!" for true case
-          const functionStr = code.toString();
-          const hasParameter = /function\s+getLoveMessage\s*\(\s*inLove\s*\)/.test(functionStr);
-          const hasDefaultMessage = /message\s*=\s*["'].*["']\s*;/.test(functionStr);
-          const hasCorrectTrueCase = functionStr.includes('My heart beats for you!');
-          
-          // Test the function
-          const fn = new Function('return ' + code)();
-          const falseCase = fn(false);
-          const trueCase = fn(true);
-          
-          return {
-            isValid: hasParameter && 
-                    hasDefaultMessage && 
-                    hasCorrectTrueCase &&
-                    typeof falseCase === 'string' &&
-                    falseCase.length > 0 &&
-                    trueCase === "My heart beats for you!",
-            error: null
-          };
+        const functionStr = code.toString();
+
+        switch(currentProblem.id) {
+          case 1: // Infinite Loop of Love
+            const hasTimesParam = /function\s+sendLoveMessages\s*\(\s*times\s*\)/.test(functionStr);
+            const hasCounter = /let|var\s+count\s*=\s*0/.test(functionStr);
+            const hasLoopCondition = /while\s*\(\s*count\s*<\s*times\s*\)/.test(functionStr);
+            const hasIncrement = /count\s*\+\+|\+\+\s*count|count\s*=\s*count\s*\+\s*1/.test(functionStr);
+            return {
+              isValid: hasTimesParam && hasCounter && hasLoopCondition && hasIncrement,
+              error: null
+            };
+
+          case 2: // Undefined Love
+            const hasInLoveParam = /function\s+getLoveMessage\s*\(\s*inLove\s*\)/.test(functionStr);
+            const hasDefaultMessage = /message\s*=\s*["'].*["']\s*;/.test(functionStr);
+            const hasCorrectTrueCase = functionStr.includes('My heart beats for you!');
+            const fn = new Function('return ' + code)();
+            const falseCase = fn(false);
+            const trueCase = fn(true);
+            return {
+              isValid: hasInLoveParam && 
+                      hasDefaultMessage && 
+                      hasCorrectTrueCase &&
+                      typeof falseCase === 'string' &&
+                      falseCase.length > 0 &&
+                      trueCase === "My heart beats for you!",
+              error: null
+            };
+
+          case 3: // Valentine's String Comparison
+            const hasArrowFunction = /const\s+checkValentine\s*=\s*\(\s*message\s*\)\s*=>/.test(functionStr);
+            const hasCorrectComparison = /message\s*===\s*sweetMessage/.test(functionStr);
+            const hasCorrectReturns = functionStr.includes('Perfect match! 💕') && functionStr.includes('Keep looking! 💔');
+            return {
+              isValid: hasArrowFunction && hasCorrectComparison && hasCorrectReturns,
+              error: null
+            };
+
+          case 4: // Love Letter Array
+            const hasLettersParam = /const\s+getLastLoveLetter\s*=\s*\(\s*letters\s*\)\s*=>/.test(functionStr);
+            const hasCorrectIndex = /letters\s*\[\s*letters\.length\s*-\s*1\s*\]/.test(functionStr);
+            return {
+              isValid: hasLettersParam && hasCorrectIndex,
+              error: null
+            };
+
+          case 5: // Heartbeat Counter
+            const hasHeartbeatsVar = /let\s+heartbeats\s*=\s*0/.test(functionStr);
+            const hasHeartCondition = /while\s*\(\s*heartbeats\s*<\s*3\s*\)/.test(functionStr);
+            const hasHeartIncrement = /heartbeats\s*\+\+|\+\+\s*heartbeats/.test(functionStr);
+            return {
+              isValid: hasHeartbeatsVar && hasHeartCondition && hasHeartIncrement,
+              error: null
+            };
+
+          case 6: // Love Calculator
+            const hasLoveCalcFunction = /function\s+calculateLove\s*\(\s*name1\s*,\s*name2\s*\)/.test(functionStr);
+            const hasModulo = /%.*(100|99)/.test(functionStr);
+            const hasAddOne = /\+\s*1/.test(functionStr);
+            return {
+              isValid: hasLoveCalcFunction && hasModulo && hasAddOne,
+              error: null
+            };
+
+          case 7: // Valentine's Promise
+            const hasJsonReturn = /return\s+response\.json\(\)/.test(functionStr);
+            const hasMessageLog = /console\.log\([^)]*data\.message[^)]*\)/.test(functionStr);
+            return {
+              isValid: hasJsonReturn && hasMessageLog,
+              error: null
+            };
+
+          case 8: // Love Note Scope
+            const hasLetMessage = /let\s+message/.test(functionStr);
+            const hasForeverConcat = /\+=\s*["']\s*forever\s*["']/.test(functionStr);
+            return {
+              isValid: hasLetMessage && hasForeverConcat,
+              error: null
+            };
+
+          case 9: // Heart Drawing
+            const hasAwaitFetch = /await\s+fetch/.test(functionStr);
+            const hasAwaitJson = /await.*\.json\(\)/.test(functionStr);
+            const hasHeartReturn = /return\s*["']❤️/.test(functionStr);
+            return {
+              isValid: hasAwaitFetch && hasAwaitJson && hasHeartReturn,
+              error: null
+            };
+
+          case 10: // Love Letter Copy
+            const hasSpreadOperator = /\{\s*\.\.\.original\s*\}/.test(functionStr);
+            const hasCopyMessage = /copy\.message\s*=/.test(functionStr);
+            return {
+              isValid: hasSpreadOperator && hasCopyMessage,
+              error: null
+            };
+
+          default:
+            return { isValid: false, error: 'Unknown bug type' };
         }
-        
-        // For the infinite loop bug
-        if (currentProblem.id === 1) {
-          // Check if the function:
-          // 1. Takes a 'times' parameter
-          // 2. Has a counter variable
-          // 3. Has a condition to stop the loop
-          const functionStr = code.toString();
-          const hasParameter = /function\s+sendLoveMessages\s*\(\s*times\s*\)/.test(functionStr);
-          const hasCounter = /let|var\s+count\s*=\s*0/.test(functionStr);
-          const hasCondition = /while\s*\(\s*count\s*<\s*times\s*\)/.test(functionStr);
-          const hasIncrement = /count\s*\+\+|\+\+\s*count|count\s*=\s*count\s*\+\s*1/.test(functionStr);
-          
-          return {
-            isValid: hasParameter && hasCounter && hasCondition && hasIncrement,
-            error: null
-          };
-        }
-        
-        return { isValid: false, error: 'Unknown bug type' };
       } catch (error) {
         return { isValid: false, error: error.message };
       }
@@ -179,7 +167,7 @@ function App() {
       
       // Wait a moment before moving to next problem
       setTimeout(() => {
-        if (currentBug < commonBugs.length - 1) {
+        if (currentBug < bugs.length - 1) {
           setCurrentBug(prev => prev + 1)
           setUserSolution('')
           setHintLevel(0)
@@ -190,34 +178,7 @@ function App() {
       }, 2000)
     } else {
       // Provide more specific feedback based on what's missing
-      let errorMessage = '💔 Not quite right. ';
-      
-      if (currentProblem.id === 2) {
-        const functionStr = userSolution.toString();
-        if (!/function\s+getLoveMessage\s*\(\s*inLove\s*\)/.test(functionStr)) {
-          errorMessage += "Make sure your function takes an 'inLove' parameter. ";
-        }
-        if (!/message\s*=\s*["'].*["']\s*;/.test(functionStr)) {
-          errorMessage += "Add a default message for when inLove is false. ";
-        }
-        if (!functionStr.includes('My heart beats for you!')) {
-          errorMessage += "Keep the original love message for when inLove is true. ";
-        }
-      } else if (currentProblem.id === 1) {
-        const functionStr = userSolution.toString();
-        if (!/function\s+sendLoveMessages\s*\(\s*times\s*\)/.test(functionStr)) {
-          errorMessage += "Make sure your function takes a 'times' parameter. ";
-        }
-        if (!/let|var\s+count\s*=\s*0/.test(functionStr)) {
-          errorMessage += "You need a counter variable. ";
-        }
-        if (!/while\s*\(\s*count\s*<\s*times\s*\)/.test(functionStr)) {
-          errorMessage += "Add a condition to stop the loop. ";
-        }
-        if (!/count\s*\+\+|\+\+\s*count|count\s*=\s*count\s*\+\s*1/.test(functionStr)) {
-          errorMessage += "Don't forget to increment your counter! ";
-        }
-      }
+      let errorMessage = '💔 Not quite right.';
       
       setFeedback({
         type: 'error',
@@ -239,6 +200,18 @@ function App() {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  // Reset game function
+  const resetGame = () => {
+    setBugs(getRandomBugs(3))
+    setCurrentBug(0)
+    setHintLevel(0)
+    setUserSolution('')
+    setTimeLeft(300)
+    setGameOver(false)
+    setScore(0)
+    setFeedback(null)
   }
 
   return (
@@ -264,8 +237,8 @@ function App() {
       {!gameOver ? (
         <Card className="backdrop-blur-sm bg-white/90">
           <CardHeader>
-            <CardTitle>{commonBugs[currentBug].title}</CardTitle>
-            <CardDescription>{commonBugs[currentBug].bugDescription}</CardDescription>
+            <CardTitle>{bugs[currentBug].title}</CardTitle>
+            <CardDescription>{bugs[currentBug].bugDescription}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="code-display">
@@ -277,7 +250,7 @@ function App() {
                   borderRadius: '0.5rem',
                 }}
               >
-                {commonBugs[currentBug].code}
+                {bugs[currentBug].code}
               </SyntaxHighlighter>
             </div>
 
@@ -293,7 +266,7 @@ function App() {
 
             {hintLevel > 0 && (
               <div className="space-y-4 my-4">
-                {commonBugs[currentBug].hints.slice(0, hintLevel).map((hint, index) => (
+                {bugs[currentBug].hints.slice(0, hintLevel).map((hint, index) => (
                   <div key={index} className="hint-box">
                     {typeof hint === 'string' ? (
                       <p>
@@ -366,7 +339,7 @@ function App() {
           <CardFooter className="justify-center">
             <Button
               variant="default"
-              onClick={() => window.location.reload()}
+              onClick={resetGame}
               className="mt-4"
             >
               Play Again 💕
