@@ -1,93 +1,48 @@
-import { cn } from "../lib/utils"
+import React from 'react'
 
-export function Card({
-  className,
-  children,
-  ...props
-}) {
+export function Card({ className, children }) {
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-valentine-primary/20 bg-white p-6 shadow-lg",
-        className
-      )}
-      {...props}
-    >
+    <div className={`rounded-xl border border-valentine-accent/20 bg-white/80 backdrop-blur-lg shadow-soft transition-all duration-300 hover:shadow-glow ${className}`}>
       {children}
     </div>
   )
 }
 
-export function CardHeader({
-  className,
-  children,
-  ...props
-}) {
+export function CardHeader({ className, children }) {
   return (
-    <div
-      className={cn("flex flex-col space-y-1.5 pb-4", className)}
-      {...props}
-    >
+    <div className={`p-6 ${className}`}>
       {children}
     </div>
   )
 }
 
-export function CardTitle({
-  className,
-  children,
-  ...props
-}) {
+export function CardTitle({ className, children }) {
   return (
-    <h3
-      className={cn(
-        "text-2xl font-semibold leading-none tracking-tight text-valentine-primary",
-        className
-      )}
-      {...props}
-    >
+    <h3 className={`text-2xl font-semibold text-valentine-neutral tracking-tight ${className}`}>
       {children}
     </h3>
   )
 }
 
-export function CardDescription({
-  className,
-  children,
-  ...props
-}) {
+export function CardDescription({ className, children }) {
   return (
-    <p
-      className={cn("text-sm text-valentine-secondary", className)}
-      {...props}
-    >
+    <p className={`mt-2 text-valentine-neutral/80 ${className}`}>
       {children}
     </p>
   )
 }
 
-export function CardContent({
-  className,
-  children,
-  ...props
-}) {
+export function CardContent({ className, children }) {
   return (
-    <div className={cn("pt-0", className)} {...props}>
+    <div className={`p-6 pt-0 ${className}`}>
       {children}
     </div>
   )
 }
 
-export function CardFooter({
-  className,
-  children,
-  ...props
-}) {
+export function CardFooter({ className, children }) {
   return (
-    <div
-      className={cn("flex items-center pt-4", className)}
-      {...props}
-    >
+    <div className={`flex items-center p-6 pt-0 ${className}`}>
       {children}
     </div>
   )

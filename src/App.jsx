@@ -102,10 +102,69 @@ function App() {
 
   const checkSolution = () => {
     const currentProblem = commonBugs[currentBug]
-    const normalizedSolution = userSolution.replace(/\s/g, '')
-    const normalizedCorrect = currentProblem.solution.replace(/\s/g, '')
     
-    if (normalizedSolution === normalizedCorrect) {
+    // Create a safe evaluation environment
+    const validateCode = (code) => {
+      try {
+        // Remove any unsafe code patterns
+        if (code.includes('eval') || code.includes('Function') || code.includes('import')) {
+          return { isValid: false, error: 'Unsafe code detected' };
+        }
+
+        // For the undefined love bug
+        if (currentProblem.id === 2) {
+          // Check if the function:
+          // 1. Takes an 'inLove' parameter
+          // 2. Has a default message for false case
+          // 3. Returns "My heart beats for you!" for true case
+          const functionStr = code.toString();
+          const hasParameter = /function\s+getLoveMessage\s*\(\s*inLove\s*\)/.test(functionStr);
+          const hasDefaultMessage = /message\s*=\s*["'].*["']\s*;/.test(functionStr);
+          const hasCorrectTrueCase = functionStr.includes('My heart beats for you!');
+          
+          // Test the function
+          const fn = new Function('return ' + code)();
+          const falseCase = fn(false);
+          const trueCase = fn(true);
+          
+          return {
+            isValid: hasParameter && 
+                    hasDefaultMessage && 
+                    hasCorrectTrueCase &&
+                    typeof falseCase === 'string' &&
+                    falseCase.length > 0 &&
+                    trueCase === "My heart beats for you!",
+            error: null
+          };
+        }
+        
+        // For the infinite loop bug
+        if (currentProblem.id === 1) {
+          // Check if the function:
+          // 1. Takes a 'times' parameter
+          // 2. Has a counter variable
+          // 3. Has a condition to stop the loop
+          const functionStr = code.toString();
+          const hasParameter = /function\s+sendLoveMessages\s*\(\s*times\s*\)/.test(functionStr);
+          const hasCounter = /let|var\s+count\s*=\s*0/.test(functionStr);
+          const hasCondition = /while\s*\(\s*count\s*<\s*times\s*\)/.test(functionStr);
+          const hasIncrement = /count\s*\+\+|\+\+\s*count|count\s*=\s*count\s*\+\s*1/.test(functionStr);
+          
+          return {
+            isValid: hasParameter && hasCounter && hasCondition && hasIncrement,
+            error: null
+          };
+        }
+        
+        return { isValid: false, error: 'Unknown bug type' };
+      } catch (error) {
+        return { isValid: false, error: error.message };
+      }
+    };
+
+    const result = validateCode(userSolution);
+    
+    if (result.isValid) {
       // Calculate score based on hints used
       const hintPenalty = hintLevel * 5 // -5 points per hint used
       const timeBonus = Math.floor(timeLeft / 10) // +1 point per 10 seconds left
@@ -130,9 +189,39 @@ function App() {
         }
       }, 2000)
     } else {
+      // Provide more specific feedback based on what's missing
+      let errorMessage = '💔 Not quite right. ';
+      
+      if (currentProblem.id === 2) {
+        const functionStr = userSolution.toString();
+        if (!/function\s+getLoveMessage\s*\(\s*inLove\s*\)/.test(functionStr)) {
+          errorMessage += "Make sure your function takes an 'inLove' parameter. ";
+        }
+        if (!/message\s*=\s*["'].*["']\s*;/.test(functionStr)) {
+          errorMessage += "Add a default message for when inLove is false. ";
+        }
+        if (!functionStr.includes('My heart beats for you!')) {
+          errorMessage += "Keep the original love message for when inLove is true. ";
+        }
+      } else if (currentProblem.id === 1) {
+        const functionStr = userSolution.toString();
+        if (!/function\s+sendLoveMessages\s*\(\s*times\s*\)/.test(functionStr)) {
+          errorMessage += "Make sure your function takes a 'times' parameter. ";
+        }
+        if (!/let|var\s+count\s*=\s*0/.test(functionStr)) {
+          errorMessage += "You need a counter variable. ";
+        }
+        if (!/while\s*\(\s*count\s*<\s*times\s*\)/.test(functionStr)) {
+          errorMessage += "Add a condition to stop the loop. ";
+        }
+        if (!/count\s*\+\+|\+\+\s*count|count\s*=\s*count\s*\+\s*1/.test(functionStr)) {
+          errorMessage += "Don't forget to increment your counter! ";
+        }
+      }
+      
       setFeedback({
         type: 'error',
-        message: '💔 Not quite right. Try again or use a hint!'
+        message: errorMessage
       })
     }
   }

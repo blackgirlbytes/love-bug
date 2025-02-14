@@ -1,36 +1,17 @@
-import { cn } from "../lib/utils"
+import React from 'react'
 
-export function Button({
-  className,
-  variant = "default",
-  size = "default",
-  children,
-  ...props
-}) {
-  const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+export function Button({ className, variant = 'default', children, ...props }) {
+  const baseStyles = 'inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
   
   const variants = {
-    default: "bg-valentine-primary text-white shadow hover:bg-valentine-primary/90",
-    secondary: "bg-valentine-secondary text-white shadow-sm hover:bg-valentine-secondary/90",
-    outline: "border border-valentine-primary bg-transparent hover:bg-valentine-primary/10 text-valentine-primary",
-    ghost: "hover:bg-valentine-primary/10 text-valentine-primary",
-  }
-
-  const sizes = {
-    default: "h-9 px-4 py-2",
-    sm: "h-8 rounded-md px-3 text-xs",
-    lg: "h-10 rounded-md px-8",
-    icon: "h-9 w-9",
+    default: 'bg-valentine-primary text-white hover:bg-valentine-deep focus:ring-valentine-primary/50',
+    outline: 'border border-valentine-primary/20 bg-transparent text-valentine-primary hover:bg-valentine-primary/10 focus:ring-valentine-primary/50',
+    secondary: 'bg-valentine-light text-valentine-primary hover:bg-valentine-accent/20 focus:ring-valentine-primary/50'
   }
 
   return (
     <button
-      className={cn(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        className
-      )}
+      className={`${baseStyles} ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
