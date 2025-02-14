@@ -11,6 +11,7 @@ function App() {
   const [currentBug, setCurrentBug] = useState(0)
   const [hintLevel, setHintLevel] = useState(0)
   const [userSolution, setUserSolution] = useState('')
+  const [wrongAttempts, setWrongAttempts] = useState(0)
   const [timeLeft, setTimeLeft] = useState(300) // 5 minutes
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
@@ -30,6 +31,13 @@ function App() {
   const showNextHint = () => {
     if (hintLevel < 4) {
       setHintLevel(prev => prev + 1)
+      // Immediate penalty for using a hint
+      setScore(prev => Math.max(0, prev - 5))
+      setFeedback({
+        type: 'warning',
+        message: '💔 -5 points for using a hint!'
+      })
+      setTimeout(() => setFeedback(null), 2000)
     }
   }
 
@@ -153,16 +161,15 @@ function App() {
     const result = validateCode(userSolution);
     
     if (result.isValid) {
-      // Calculate score based on hints used
-      const hintPenalty = hintLevel * 5 // -5 points per hint used
+      // Calculate score based on time bonus only since hint penalties are applied immediately
       const timeBonus = Math.floor(timeLeft / 10) // +1 point per 10 seconds left
       const baseScore = 20 // Base score for solving the problem
-      const totalScore = Math.max(0, baseScore - hintPenalty + timeBonus)
+      const totalScore = baseScore + timeBonus
       
       setScore(prev => prev + totalScore)
       setFeedback({
         type: 'success',
-        message: `💖 Perfect! +${totalScore} points (${baseScore} base ${timeBonus > 0 ? `+${timeBonus} time bonus` : ''} ${hintPenalty > 0 ? `-${hintPenalty} hint penalty` : ''})`
+        message: `💖 Perfect! +${totalScore} points (${baseScore} base ${timeBonus > 0 ? `+${timeBonus} time bonus` : ''})`
       })
       
       // Wait a moment before moving to next problem
@@ -171,18 +178,34 @@ function App() {
           setCurrentBug(prev => prev + 1)
           setUserSolution('')
           setHintLevel(0)
+          setWrongAttempts(0)
           setFeedback(null)
         } else {
           setGameOver(true)
         }
       }, 2000)
     } else {
-      // Provide more specific feedback based on what's missing
-      let errorMessage = '💔 Not quite right.';
+      // Increment wrong attempts and apply penalty
+      setWrongAttempts(prev => prev + 1)
+      const penalty = wrongAttempts + 1; // Increasing penalty for each attempt
+      setScore(prev => Math.max(0, prev - penalty))
+      
+      // Different messages based on number of attempts
+      let errorMessage;
+      if (wrongAttempts === 0) {
+        errorMessage = '💔 Not quite right. (-1 point)';
+      } else if (wrongAttempts === 1) {
+        errorMessage = '💔💔 Still not correct... Try reviewing the bug description! (-2 points)';
+      } else if (wrongAttempts === 2) {
+        errorMessage = '💔💔💔 Getting warmer? Maybe a hint would help! (-3 points)';
+      } else {
+        errorMessage = `💔💔💔💔 Oh no! ${penalty} wrong attempts... (-${penalty} points)`;
+      }
       
       setFeedback({
         type: 'error',
-        message: errorMessage
+        message: errorMessage,
+        shake: true // We'll use this for animation
       })
     }
   }
@@ -211,6 +234,7 @@ function App() {
     setTimeLeft(300)
     setGameOver(false)
     setScore(0)
+    setWrongAttempts(0)
     setFeedback(null)
   }
 
@@ -257,7 +281,8 @@ function App() {
             {feedback && (
               <div className={`my-4 p-4 rounded-lg ${
                 feedback.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
-                feedback.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                feedback.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200 ' + (feedback.shake ? 'animate-shake' : '') :
+                feedback.type === 'warning' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
                 'bg-blue-100 text-blue-800 border border-blue-200'
               }`}>
                 {feedback.message}

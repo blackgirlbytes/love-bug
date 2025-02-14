@@ -1,99 +1,5 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
 body {
   font-family: 'Outfit', sans-serif;
-}
-
-.game-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.game-header {
-  animation: fadeIn 0.8s ease-out;
-}
-
-.game-title {
-  font-size: 3rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #E94D84 0%, #F178B6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
-}
-
-.game-subtitle {
-  color: #2A0B18;
-  font-size: 1.2rem;
-  font-weight: 300;
-  margin-bottom: 2rem;
-}
-
-.stats-container {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.stat-box {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(233, 77, 132, 0.1);
-  transition: transform 0.2s ease;
-}
-
-.stat-box:hover {
-  transform: translateY(-2px);
-}
-
-.code-display {
-  margin: 1.5rem 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.code-editor {
-  width: 100%;
-  min-height: 200px;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 2px solid rgba(233, 77, 132, 0.2);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  font-family: 'Monaco', 'Consolas', monospace;
-  resize: vertical;
-  transition: border-color 0.2s ease;
-}
-
-.code-editor:focus {
-  outline: none;
-  border-color: #E94D84;
-  box-shadow: 0 0 0 3px rgba(233, 77, 132, 0.1);
-}
-
-.hint-box {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  border-radius: 12px;
-  padding: 1rem;
-  border: 1px solid rgba(233, 77, 132, 0.2);
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-.hint-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(233, 77, 132, 0.1);
 }
 
 @keyframes fadeIn {
@@ -114,8 +20,4 @@ body {
   50% {
     transform: translateY(-10px);
   }
-}
-
-.floating {
-  animation: float 6s ease-in-out infinite;
 }
