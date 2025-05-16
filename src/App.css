@@ -2,6 +2,10 @@ body {
   font-family: 'Outfit', sans-serif;
 }
 
+.game-title {
+  color: purple;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
