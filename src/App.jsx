@@ -242,7 +242,7 @@ function App() {
   return (
     <div className="game-container">
       <header className="game-header">
-        <h1 className="game-title">
+        <h1 className="text-5xl font-bold text-purple-600 mb-4 animate-bounce">
           ❤️ Love.bug() ❤️
         </h1>
         <p className="game-subtitle">Fix the broken hearts in the code!</p>
